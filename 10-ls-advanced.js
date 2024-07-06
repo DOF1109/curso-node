@@ -1,5 +1,6 @@
 const fs = require("node:fs/promises");
 const path = require("node:path");
+const pc = require("picocolors");
 
 // ?? ---> es nullish
 // si el valor de la izq es null o undefined retorna el valor de la der
@@ -11,7 +12,7 @@ async function ls(folder) {
   try {
     files = await fs.readdir(folder);
   } catch (e) {
-    console.log("No se pudo leer el directorio: " + folder);
+    console.log(pc.red("No se pudo leer el directorio: " + folder));
     process.exit(1);
   }
 
@@ -31,9 +32,9 @@ async function ls(folder) {
     const fileSize = stats.size;
     const fileModified = stats.mtime.toLocaleString();
 
-    return `${fileType} ${file.padEnd(20)} ${fileSize
-      .toString()
-      .padStart(10)} ${fileModified}`;
+    return `${fileType} ${pc.green(file.padEnd(20))} ${pc.yellow(
+      fileSize.toString().padStart(10)
+    )} ${pc.blue(fileModified)}`;
   });
 
   const filesInfo = await Promise.all(filesPromises);
