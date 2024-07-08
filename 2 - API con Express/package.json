@@ -4,7 +4,8 @@
   "description": "",
   "main": "1-https.js",
   "scripts": {
-    "dev": "nodemon 1-https.js"
+    "dev-1": "nodemon 1-https.js",
+    "dev-2": "nodemon 2-routing.js"
   },
   "keywords": [],
   "author": "",
