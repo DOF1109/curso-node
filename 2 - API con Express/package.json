@@ -1,0 +1,16 @@
+{
+  "name": "2---api-con-express",
+  "version": "1.0.0",
+  "description": "",
+  "main": "1-https.js",
+  "scripts": {
+    "dev": "nodemon 1-https.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^3.1.4",
+    "standard": "^17.1.0"
+  }
+}
