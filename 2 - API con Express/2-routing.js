@@ -21,16 +21,18 @@ const processRequest = (req, res) => {
       switch (url) {
         case "/pokemon": {
           let body = "";
-          // Escucho el evento data
+          // Escucho el evento data y lo guardo a medida que llegan los datos en fragmentos
           req.on("data", (chunk) => {
             body += chunk.toString();
           });
           // Escucho el evento end
-          req.on("end", () => {});
-          break;
-        }
-        case "otro": {
-          let body = "";
+          req.on("end", () => {
+            const data = JSON.parse(body)
+            // llamar a una bbdd para almacenar info
+            res.writeHead(201, {"Content-Type": "application/json; charset=utf-8"})
+            data.timestamp = Date.now()
+            res.end(JSON.stringify(data))
+          });
           break;
         }
         default:
