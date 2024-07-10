@@ -27,11 +27,13 @@ const processRequest = (req, res) => {
           });
           // Escucho el evento end
           req.on("end", () => {
-            const data = JSON.parse(body)
+            const data = JSON.parse(body);
             // llamar a una bbdd para almacenar info
-            res.writeHead(201, {"Content-Type": "application/json; charset=utf-8"})
-            data.timestamp = Date.now()
-            res.end(JSON.stringify(data))
+            res.writeHead(201, {
+              "Content-Type": "application/json; charset=utf-8",
+            });
+            data.timestamp = Date.now();
+            res.end(JSON.stringify(data));
           });
           break;
         }
