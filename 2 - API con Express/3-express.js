@@ -8,24 +8,9 @@ const app = express();
 app.disable("x-powered-by");
 
 // ------------ Middleware ------------
-app.use((req, res, next) => {
-  if ( req.method !== "POST") return next();
-  if (req.headers["content-type"] !== "application/json") return next();
-
-  let body = "";
-  // Escucho el evento data y lo guardo a medida que llegan los datos en fragmentos
-  req.on("data", (chunk) => {
-    body += chunk.toString();
-  });
-  // Escucho el evento end
-  req.on("end", () => {
-    const data = JSON.parse(body);
-    data.timestamp = Date.now();
-    // Muta la request y mete la info en el body
-    req.body = data
-    next()
-  });
-});
+// middleware de express que obtiene la info enviada con la request
+// y la deja disponible en "req.body" en formato objeto de js
+app.use(express.json());
 
 // ------------ Endpoints ------------
 app.get("/pokemon/ditto", (req, res) => {
