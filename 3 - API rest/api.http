@@ -18,7 +18,7 @@ Content-Type: application/json
   "duration": 150,
   "poster": "https://www.otroscines.com/images/fotos/elijo-creer-muchachos-1200.jpg",
   "genre": [
-    "Drama", 
-    "Suspenso"
-  ],
+    "Drama",
+    "Action"
+  ]
 }

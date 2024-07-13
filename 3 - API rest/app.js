@@ -1,7 +1,7 @@
 const express = require("express");
 const movies = require("./movies.json");
 const crypto = require("node:crypto"); // para crear los id
-// const { validateMovie } = require("./schemas/movies");
+const { validateMovie } = require("./schemas/movies.js");
 
 const PORT = process.env.PORT ?? 1234;
 
@@ -35,11 +35,9 @@ app.get("/movies/:id", (req, res) => {
 });
 
 app.post("/movies", (req, res) => {
-  console.log("Recived request");
   const resultValidation = validateMovie(req.body);
 
   if (resultValidation.error) {
-    console.log("Validation error");
     res.status(400).json({
       error: JSON.parse(resultValidation.error.message),
     });
