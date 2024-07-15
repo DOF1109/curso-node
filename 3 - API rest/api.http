@@ -12,6 +12,7 @@ POST http://localhost:1234/movies
 Content-Type: application/json
 
 {
+  "sql": "SELECT * FROM users",
   "title": "Muchachos",
   "year": 2022,
   "director": "Lionel Messi",
