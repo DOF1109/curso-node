@@ -52,16 +52,31 @@ app.post("/movies", (req, res) => {
 });
 
 app.patch("/movies/:id", (req, res) => {
-  const { id } = req.params;
   const resultValidation = validatePartialMovie(req.body);
-
+  
   if (resultValidation.error) {
     res.status(404).json({ 
       error: JSON.parse(resultValidation.error.message) 
     });
   }
-
+  
+  const { id } = req.params;
   const movieIndex = movies.findIndex((movie) => movie.id === id);
+  
+  if (movieIndex === -1) {
+    res.status(404).json({
+      message: "Movie not found"
+    })
+  }
+
+  const updateMovie = {
+    ...movies[movieIndex],
+    ...resultValidation.data
+  }
+  
+  movies[movieIndex] = updateMovie
+
+  return res.json(updateMovie)
 });
 
 // ------------ Inicia el server ------------
