@@ -1,6 +1,7 @@
 const express = require("express");
 const movies = require("./movies.json");
 const crypto = require("node:crypto"); // para crear los id
+const cors = require("cors") // para permitir CORS desde navegador
 const { validateMovie, validatePartialMovie } = require("./schemas/movies.js");
 
 const PORT = process.env.PORT ?? 1234;
@@ -8,16 +9,28 @@ const PORT = process.env.PORT ?? 1234;
 const app = express();
 app.disable("x-powered-by"); // desabilita el header X-Powered-By: Express
 
+// Metodos simples: GET, HEAD, POST
+// Metodos complejos: PUT, PATCH, DELETE
+
+// CORS PRE-Fligth --> para metodos complejos
+// Hace una peticion OPTIONS antes de hacer un PUT, PATCH o DELETE
+
+// Origenes acetados por CORS
+const ACCPTED_ORIGINS = [
+  "http://localhost:8080",
+  "http://localhost:1234",
+  "https://movie.com",
+  "https://midu.dev"
+]
+
 // ------------ Middleware ------------
 app.use(express.json());
+app.use(cors())
 
 // ------------ Endpoints ------------
-app.get("/", (req, res) => {
-  res.json({ saludo: "Hola mundo!" });
-});
-
 app.get("/movies", (req, res) => {
   const { genre } = req.query;
+  
   if (genre) {
     const filteredMovies = movies.filter((movie) =>
       movie.genre.some((gen) => gen.toLowerCase() === genre.toLowerCase())
@@ -50,6 +63,20 @@ app.post("/movies", (req, res) => {
   movies.push(newMovie);
   res.status(201).json(newMovie); // devuelvo lo creado para actualizar la caché
 });
+
+app.delete("/movies/:id", (req, res) => {
+  const { id } = req.params
+  const movieIndex = movies.findIndex(movie => movie.id === id)
+
+  if (movieIndex === -1) {
+    res.status(404).json({ message: "Movie not found" })
+  }
+
+  // eliminamos el elemento
+  movies.splice(movieIndex, 1)
+
+  return res.json({ message: "Movie deleted" })
+})
 
 app.patch("/movies/:id", (req, res) => {
   const resultValidation = validatePartialMovie(req.body);
