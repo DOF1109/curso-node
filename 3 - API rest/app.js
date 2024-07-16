@@ -1,7 +1,7 @@
 const express = require("express");
 const movies = require("./movies.json");
 const crypto = require("node:crypto"); // para crear los id
-const { validateMovie } = require("./schemas/movies.js");
+const { validateMovie, validatePartialMovie } = require("./schemas/movies.js");
 
 const PORT = process.env.PORT ?? 1234;
 
@@ -49,6 +49,19 @@ app.post("/movies", (req, res) => {
   };
   movies.push(newMovie);
   res.status(201).json(newMovie); // devuelvo lo creado para actualizar la caché
+});
+
+app.patch("/movies/:id", (req, res) => {
+  const { id } = req.params;
+  const resultValidation = validatePartialMovie(req.body);
+
+  if (resultValidation.error) {
+    res.status(404).json({ 
+      error: JSON.parse(resultValidation.error.message) 
+    });
+  }
+
+  const movieIndex = movies.findIndex((movie) => movie.id === id);
 });
 
 // ------------ Inicia el server ------------

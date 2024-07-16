@@ -32,8 +32,14 @@ const movieSchema = zod.object({
 });
 
 function validateMovie(object) {
-  // con safeParse verifico más facil si tiene un error o datos
+  // con safeParse() verifico más facil si tiene un error o datos
   return movieSchema.safeParse(object);
 }
 
-module.exports = { validateMovie };
+function validatePartialMovie(object) {
+  // con partial() solo valído las propiedades que se encuetran
+  // las demás las ignora
+  return movieSchema.partial().safeParse(object);
+}
+
+module.exports = { validateMovie, validatePartialMovie };
