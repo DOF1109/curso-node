@@ -1,7 +1,7 @@
 const express = require("express");
 const movies = require("./movies.json");
 const crypto = require("node:crypto"); // para crear los id
-const cors = require("cors") // para permitir CORS desde navegador
+const cors = require("cors"); // para permitir CORS desde navegador
 const { validateMovie, validatePartialMovie } = require("./schemas/movies.js");
 
 const PORT = process.env.PORT ?? 1234;
@@ -15,22 +15,31 @@ app.disable("x-powered-by"); // desabilita el header X-Powered-By: Express
 // CORS PRE-Fligth --> para metodos complejos
 // Hace una peticion OPTIONS antes de hacer un PUT, PATCH o DELETE
 
-// Origenes acetados por CORS
-const ACCPTED_ORIGINS = [
-  "http://localhost:8080",
-  "http://localhost:1234",
-  "https://movie.com",
-  "https://midu.dev"
-]
-
 // ------------ Middleware ------------
 app.use(express.json());
-app.use(cors())
+// Personalizo los origenes permitidos para consumir la API
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // Origenes acetados por CORS
+      const ACCEPTED_ORIGINS = [
+        "http://localhost:8080",
+        "https://movie.com",
+        "https://midu.dev",
+      ];
+
+      if (ACCEPTED_ORIGINS.includes(origin) || !origin) {
+        return callback(null, true);
+      }
+      return callback(new Error("Not allowed by CORS"));
+    },
+  })
+);
 
 // ------------ Endpoints ------------
 app.get("/movies", (req, res) => {
   const { genre } = req.query;
-  
+
   if (genre) {
     const filteredMovies = movies.filter((movie) =>
       movie.genre.some((gen) => gen.toLowerCase() === genre.toLowerCase())
@@ -65,45 +74,45 @@ app.post("/movies", (req, res) => {
 });
 
 app.delete("/movies/:id", (req, res) => {
-  const { id } = req.params
-  const movieIndex = movies.findIndex(movie => movie.id === id)
+  const { id } = req.params;
+  const movieIndex = movies.findIndex((movie) => movie.id === id);
 
   if (movieIndex === -1) {
-    res.status(404).json({ message: "Movie not found" })
+    res.status(404).json({ message: "Movie not found" });
   }
 
   // eliminamos el elemento
-  movies.splice(movieIndex, 1)
+  movies.splice(movieIndex, 1);
 
-  return res.json({ message: "Movie deleted" })
-})
+  return res.json({ message: "Movie deleted" });
+});
 
 app.patch("/movies/:id", (req, res) => {
   const resultValidation = validatePartialMovie(req.body);
-  
+
   if (resultValidation.error) {
-    res.status(404).json({ 
-      error: JSON.parse(resultValidation.error.message) 
+    res.status(404).json({
+      error: JSON.parse(resultValidation.error.message),
     });
   }
-  
+
   const { id } = req.params;
   const movieIndex = movies.findIndex((movie) => movie.id === id);
-  
+
   if (movieIndex === -1) {
     res.status(404).json({
-      message: "Movie not found"
-    })
+      message: "Movie not found",
+    });
   }
 
   const updateMovie = {
     ...movies[movieIndex],
-    ...resultValidation.data
-  }
-  
-  movies[movieIndex] = updateMovie
+    ...resultValidation.data,
+  };
 
-  return res.json(updateMovie)
+  movies[movieIndex] = updateMovie;
+
+  return res.json(updateMovie);
 });
 
 // ------------ Inicia el server ------------
