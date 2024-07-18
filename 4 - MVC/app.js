@@ -3,6 +3,7 @@ import { randomUUID } from "node:crypto"; // para crear los id
 import cors from "cors"; // para permitir CORS desde navegador
 import { validateMovie, validatePartialMovie } from "./schemas/movies.js";
 // Leer json con ESModules
+// import movies from "./movies.json" with { type: "json" }; todavia no es estable
 import { createRequire } from "node:module";
 const require = createRequire(import.meta.url); // creo un require
 const movies = require("./movies.json"); // uso mi require para leer el json
