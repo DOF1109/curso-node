@@ -1,4 +1,4 @@
-import { readJSON } from "../utils.js";
+import { readJSON } from "../../utils.js";
 import { randomUUID } from "node:crypto"; // para crear los id
 
 const movies = readJSON("./movies.json");
