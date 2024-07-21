@@ -1,4 +1,5 @@
-import { MovieModel } from "../models/local-file-system/movie.js";
+// import { MovieModel } from "../models/local-file-system/movie.js"; // bbdd local
+import { MovieModel } from "../models/mysql/movie.js"; // bbdd mysql
 import { validateMovie, validatePartialMovie } from "../schemas/movies.js";
 
 export class MovieController {
