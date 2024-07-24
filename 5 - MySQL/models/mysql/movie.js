@@ -49,46 +49,55 @@ export class MovieModel {
     return movies[0];
   }
 
-  // falta extraer e insertar los generos
   static async create({ input }) {
     // Extraigo los valores del input
     const {
-      genre: genreInput, // un array
       title,
       year,
       duration,
       director,
       rate,
       poster,
+      genre, // array de strings
     } = input;
 
-    // todo: crear la conexion de genre
-
-    // Genero un uuid con mysql
-    const [uuidResult] = await connection.query(`SELECT UUID() uuid;`);
-    const [{ uuid }] = uuidResult;
-
     try {
+      // Genero un uuid con mysql
+      const [uuidResult] = await connection.query(`SELECT UUID() uuid;`);
+      const [{ uuid }] = uuidResult;
+      
       // Inserto la pelicula en la BD
-      const result = await connection.query(
+      const resultInsertMovie = await connection.query(
         `INSERT INTO movie (id, title, year, duration, director, poster, rate)
           VALUES (UUID_TO_BIN(?), ?, ?, ?, ?, ?, ?);`,
         [uuid, title, year, duration, director, poster, rate]
       );
+
+      // Obtengo los ids de los generos
+      let genresIds = []
+      genre.map( async (g) => {
+        const [genreId] = await connection.query(
+          `SELECT id FROM genre WHERE LOWER(name) = ?;`,
+          [g.toLowerCase()]
+        )
+        genresIds.push(genreId[0])
+      })
+
+      // Creo las relaciones entre la movie y sus generos
+      genresIds.map( async (genreId) => {
+        const resultInsertMovieGenre = await connection.query(
+          `INSERT INTO movie_genre (movie_id, genre_id) VALUES (?, ?);`,
+          [uuid, genreId]
+        )
+      })
+
+      return this.getById({ uuid });
+
     } catch (error) {
       throw new Error("Error creating movie");
       // los detalles del error enviar a un servicio interno no al usuario
       // sendLog(error)
     }
-
-    const [movies] = await connection.query(
-      `SELECT BIN_TO_UUID(id) AS id, title, year, duration, director, rate, poster
-        FROM movie
-        WHERE id = UUID_TO_BIN(?);`,
-      [uuid]
-    );
-
-    return movies[0];
   }
 
   static async delete({ id }) {

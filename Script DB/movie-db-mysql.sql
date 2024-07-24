@@ -50,3 +50,9 @@ INSERT INTO movie_genre (movie_id, genre_id) VALUES
 ((SELECT id FROM movie WHERE title = "Interstellar"), (SELECT id FROM genre WHERE name = "Sci-Fi"));
 
 SELECT BIN_TO_UUID(id) AS id, title, year, director, duration, poster, rate FROM movie;
+
+SELECT BIN_TO_UUID(m.id) AS id, m.title, m.year, m.director, m.duration, m.poster, m.rate, g.name 
+FROM movie m
+JOIN movie_genre mg ON m.id = mg.movie_id
+JOIN genre g ON mg.genre_id = g.id
+WHERE m.id = UUID_TO_BIN('9ebf884d-46f0-11ef-b865-0242ac110002');
