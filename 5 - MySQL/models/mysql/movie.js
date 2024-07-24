@@ -15,26 +15,21 @@ const connection = await mysql.createConnection(config);
 export class MovieModel {
   static async getAll({ genre }) {
     if (genre) {
-      const lowerCaseGenre = genre.toLowerCase();
+      // Obtengo las movies que coinciden con el género ingresado en minusculas
+      const [movies] = await connection.query(
+        `SELECT BIN_TO_UUID(id) AS id, title, year, director, duration, poster, rate
+          FROM movies m
+          JOIN movie_genre mg ON m.id = mg.movie_id
+          JOIN genre g ON mg.genre_id = g.id
+          WHERE LOWER(g.name) = ?;`,
+          [genre.toLowerCase()]
+      )
 
-      // Obtengo el id del género que coincide con el género ingresado en minusculas
-      const [genres] = await connection.query(
-        "SELECT id, name FROM genre WHERE LOWER(name) =?",
-        [lowerCaseGenre]
-      );
+      // Si no encontró movies con ese genero
+      if (movies.length === 0) return [];
 
-      // Si no encontró el genero
-      if (genre.length === 0) return [];
-
-      // Obtengo el id del género encontrado
-      const [{ id }] = genres;
-
-      // get all movies ids from database table
-      // la query a movie_genres
-      // join
-      // devolver resultados
-      return []; // cambiar al realizar
-    }
+      return movies;
+    }  
     const [movies] = await connection.query(
       "SELECT BIN_TO_UUID(id) AS id, title, year, director, duration, poster, rate FROM movie;"
     );
@@ -96,7 +91,19 @@ export class MovieModel {
     return movies[0];
   }
 
-  static async delete({ id }) {}
+  static async delete({ id }) {
+    try {
+      const [result] = await connection.query(
+        `DELETE FROM movie WHERE id = UUID_TO_BIN(?);`,
+        [id]
+      );
+      return result.affectedRows > 0;
+    } catch (error) {
+      throw new Error("Error creating movie");
+      // los detalles del error enviar a un servicio interno no al usuario
+      // sendLog(error)
+    }
+  }
 
   static async update({ id, input }) {}
 }
