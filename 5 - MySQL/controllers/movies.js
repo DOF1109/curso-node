@@ -1,22 +1,24 @@
-// import { MovieModel } from "../models/local-file-system/movie.js"; // bbdd local
-import { MovieModel } from "../models/mysql/movie.js"; // bbdd mysql
 import { validateMovie, validatePartialMovie } from "../schemas/movies.js";
 
 export class MovieController {
-  static async getAll(req, res) {
+  constructor ({ movieModel }) {
+    this.movieModel = movieModel
+  }
+
+  getAll = async (req, res) => {
     const { genre } = req.query;
-    const movies = await MovieModel.getAll({ genre });
+    const movies = await this.movieModel.getAll({ genre });
     res.json(movies);
   }
 
-  static async getById(req, res) {
+  getById = async (req, res) => {
     const { id } = req.params;
-    const movie = await MovieModel.getById({ id });
+    const movie = await this.movieModel.getById({ id });
     if (movie) return res.json(movie);
     res.status(404).json({ error: "Movie not found" });
   }
 
-  static async create(req, res) {
+  create = async (req, res) => {
     const resultValidation = validateMovie(req.body);
 
     if (resultValidation.error) {
@@ -24,20 +26,20 @@ export class MovieController {
         error: JSON.parse(resultValidation.error.message),
       });
     }
-    const newMovie = await MovieModel.create({ input: resultValidation.data });
+    const newMovie = await this.movieModel.create({ input: resultValidation.data });
     res.status(201).json(newMovie); // devuelvo lo creado para actualizar la caché
   }
 
-  static async delete(req, res) {
+  delete = async (req, res) => {
     const { id } = req.params;
-    const result = await MovieModel.delete({ id });
+    const result = await this.movieModel.delete({ id });
 
     if (result) return res.json({ message: "Movie deleted" });
 
     res.status(404).json({ message: "Movie not found" });
   }
 
-  static async update(req, res) {
+  update = async (req, res) => {
     const resultValidation = validatePartialMovie(req.body);
 
     if (resultValidation.error) {
@@ -47,7 +49,7 @@ export class MovieController {
     }
 
     const { id } = req.params;
-    const updatedMovie = await MovieModel.update({
+    const updatedMovie = await this.movieModel.update({
       id,
       input: resultValidation.data,
     });
