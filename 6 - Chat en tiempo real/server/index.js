@@ -13,8 +13,17 @@ const io = new Server(server);
 // Mostrar en consola los logs de las request al server
 app.use(logger("dev"));
 
-io.on("connetion", () => {
-  console.log("A user has connected!");
+io.on("connection", (socket) => {
+  console.log("** A user has connected!");
+
+  socket.on("disconnect", () => {
+    console.log("** An user has desconnected");
+  })
+
+  socket.on("chat message", (msg) => {
+    console.log("* Message: " + msg);
+    io.emit("chat message", msg)
+  })
 });
 
 app.get("/", (req, res) => {
